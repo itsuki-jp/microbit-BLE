@@ -32,7 +32,16 @@ micro:bit v2とPCをBluetooth（BLE）で接続し、センサーデータの取
 
 ### 1. micro:bit側のプログラム
 
-MakeCodeで以下のプログラムを作成してください：
+1. makecodeの「プロジェクトの設定」にて `No Pairing Required: Anyone can connect via Bluetooth.` を選択
+2. 拡張機能から `bluetooth` を検索、選択、追加
+<img width="761" height="237" alt="image" src="https://github.com/user-attachments/assets/34074de9-0639-4136-a5ac-943daea6c36d" />
+
+3.  
+MakeCodeで以下のプログラムを作成
+
+
+<img width="886" height="1185" alt="image" src="https://github.com/user-attachments/assets/36a27964-726a-4ddd-a626-6341d73911fd" />
+
 
 #### 最初だけ
 ```
