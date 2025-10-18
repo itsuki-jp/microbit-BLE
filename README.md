@@ -1,5 +1,7 @@
 # micro:bit BLE双方向通信プロジェクト
 
+https://itsuki-jp.github.io/microbit-BLE/
+
 micro:bit v2とPCをBluetooth（BLE）で接続し、センサーデータの取得と双方向通信を実現するプロジェクトです。
 
 ## 🎯 機能
@@ -31,6 +33,9 @@ micro:bit v2とPCをBluetooth（BLE）で接続し、センサーデータの取
 ## 🚀 セットアップ
 
 ### 1. micro:bit側のプログラム
+
+諸々がめんどくさかったら、https://makecode.microbit.org/_XhAcrhiEKA25 編集 -> ダウンロード でmirco:bit に送信して使える
+
 
 1. makecodeの「プロジェクトの設定」にて `No Pairing Required: Anyone can connect via Bluetooth.` を選択
 2. 拡張機能から `bluetooth` を検索、選択、追加
