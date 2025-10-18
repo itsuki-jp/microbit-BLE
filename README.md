@@ -1,8 +1,11 @@
 # micro:bit BLE双方向通信プロジェクト
 
+micro:bit v2とPCをBluetooth（BLE）で接続し、センサーデータの取得と双方向通信を実現するプロジェクトです。
+
 https://itsuki-jp.github.io/microbit-BLE/
 
-micro:bit v2とPCをBluetooth（BLE）で接続し、センサーデータの取得と双方向通信を実現するプロジェクトです。
+<img width="1406" height="1118" alt="image" src="https://github.com/user-attachments/assets/dd2b4f3f-e837-4169-8a6d-d7e6c0e6b5b7" />
+
 
 ## 🎯 機能
 
