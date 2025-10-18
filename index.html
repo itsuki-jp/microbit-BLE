@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+<script src="main.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎮 micro:bit 双方向通信（全センサー対応）</h1>
+  
+  <div id="status" class="status disconnected">未接続</div>
+  
+  <div class="controls">
+    <button id="connectBtn" onclick="connectToMicrobit()">micro:bitに接続</button>
+    <button id="disconnectBtn" onclick="disconnect()" disabled>切断</button>
+  </div>
+  
+  <div class="main-grid">
+    
+    <!-- 左側：メッセージ送受信 -->
+    <div class="section">
+      <h2>💬 UART通信（文字列送受信）</h2>
+      
+      <div class="sensor-card" id="uart-card">
+        <h3>📡 通信ステータス</h3>
+        <div class="sensor-value">待機中</div>
+      </div>
+      
+      <div class="input-group">
+        <input type="text" id="messageInput" placeholder="micro:bitへ送信するメッセージ">
+        <button id="sendBtn" onclick="sendMessage()" disabled>送信</button>
+      </div>
+      
+      <h3>📨 メッセージログ</h3>
+      <div class="message-container" id="messages"></div>
+    </div>
+    
+    <!-- 右側：センサー情報 -->
+    <div class="section">
+      <h2>📊 センサーデータ</h2>
+      
+      <div class="sensor-grid">
+        
+        <!-- 温度 -->
+        <div class="sensor-card" id="temp-card">
+          <h3>🌡️ 温度</h3>
+          <div class="sensor-value" id="temperature">--</div>
+        </div>
+        
+        <!-- 加速度計 -->
+        <div class="sensor-card" id="accel-card">
+          <h3>📐 加速度計</h3>
+          <p>X: <span class="sensor-value" id="accel-x">--</span></p>
+          <p>Y: <span class="sensor-value" id="accel-y">--</span></p>
+          <p>Z: <span class="sensor-value" id="accel-z">--</span></p>
+        </div>
+        
+        <!-- ボタン -->
+        <div class="sensor-card" id="button-card">
+          <h3>🔘 ボタン</h3>
+          <p>A: <span class="sensor-value" id="button-a">--</span></p>
+          <p>B: <span class="sensor-value" id="button-b">--</span></p>
+        </div>
+        
+        <!-- 磁力計 -->
+        <div class="sensor-card" id="mag-card">
+          <h3>🧭 磁力計</h3>
+          <p>X: <span class="sensor-value" id="mag-x">--</span></p>
+          <p>Y: <span class="sensor-value" id="mag-y">--</span></p>
+          <p>Z: <span class="sensor-value" id="mag-z">--</span></p>
+          <p>方位: <span class="sensor-value" id="bearing">--</span></p>
+        </div>
+        
+        <!-- LED制御 -->
+        <div class="sensor-card" id="led-card">
+          <h3>💡 LED</h3>
+          <input type="text" id="ledText" class="led-input" placeholder="表示する文字">
+          <button onclick="sendTextToLED()" style="width: 100%;">送信</button>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+</body>
+</html>
