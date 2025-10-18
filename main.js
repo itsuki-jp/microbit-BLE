@@ -29,7 +29,9 @@ let gattServer = null;
 let uartTxChar = null; // micro:bitから受信
 let uartRxChar = null; // micro:bitへ送信
 
-async function connectToMicrobit() {
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const connectToMicrobit = async () => {
   try {
     updateStatus('接続中...', false);
     
@@ -52,20 +54,20 @@ async function connectToMicrobit() {
     document.getElementById('connectBtn').disabled = true;
     document.getElementById('disconnectBtn').disabled = false;
     
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await sleep(500);
     
     // UARTサービスを最初に起動
     await startUART();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await sleep(300);
     
     await startTemperature();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await sleep(300);
     
     await startAccelerometer();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await sleep(300);
     
     await startButtons();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await sleep(300);
     
     // 磁力計は問題が起きやすいので、失敗しても続行
     try {
@@ -78,19 +80,19 @@ async function connectToMicrobit() {
   } catch(error) {
     console.error('接続エラー:', error);
     updateStatus('接続に失敗しました: ' + error.message, false);
-    if (targetDevice && targetDevice.gatt.connected) {
+    if (targetDevice?.gatt?.connected) {
       targetDevice.gatt.disconnect();
     }
   }
-}
+};
 
 // UARTサービス（文字列送受信）
-async function startUART() {
+const startUART = async () => {
   const cardId = 'uart-card';
   try {
     updateServiceStatus(cardId, '起動中...');
     
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       throw new Error('GATT未接続');
     }
     
@@ -116,18 +118,18 @@ async function startUART() {
     document.getElementById(cardId).classList.add('error');
     addMessage('UART通信が利用できません', 'system');
   }
-}
+};
 
 // micro:bitから文字列を受信したとき
-function onUARTReceived(event) {
+const onUARTReceived = (event) => {
   const decoder = new TextDecoder();
   const text = decoder.decode(event.target.value);
   console.log('受信:', text);
   addMessage(text, 'received');
-}
+};
 
 // micro:bitへ文字列を送信
-async function sendMessage() {
+const sendMessage = async () => {
   try {
     const input = document.getElementById('messageInput');
     const text = input.value;
@@ -153,37 +155,34 @@ async function sendMessage() {
     console.error('送信エラー:', error);
     alert('送信に失敗しました: ' + error.message);
   }
-}
+};
 
 // メッセージを表示
-function addMessage(text, type) {
+const addMessage = (text, type) => {
   const container = document.getElementById('messages');
   const msg = document.createElement('div');
-  msg.className = 'message ' + type;
+  msg.className = `message ${type}`;
   
   const time = new Date().toLocaleTimeString('ja-JP');
-  let typeLabel;
-  
-  if (type === 'received') {
-    typeLabel = '📥 受信';
-  } else if (type === 'sent') {
-    typeLabel = '📤 送信';
-  } else {
-    typeLabel = 'ℹ️ システム';
-  }
+  const typeLabels = {
+    received: '📥 受信',
+    sent: '📤 送信',
+    system: 'ℹ️ システム'
+  };
+  const typeLabel = typeLabels[type] || 'ℹ️ システム';
   
   msg.innerHTML = `<strong>${typeLabel}:</strong> ${text} <span class="message-time">${time}</span>`;
   container.appendChild(msg);
   container.scrollTop = container.scrollHeight;
-}
+};
 
 // 温度センサー（Period設定なし）
-async function startTemperature() {
+const startTemperature = async () => {
   const cardId = 'temp-card';
   try {
     updateServiceStatus(cardId, '起動中...');
     
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       throw new Error('GATT未接続');
     }
     
@@ -193,7 +192,7 @@ async function startTemperature() {
     await dataChar.startNotifications();
     dataChar.addEventListener('characteristicvaluechanged', (event) => {
       const temp = event.target.value.getInt8(0);
-      document.getElementById('temperature').textContent = temp + '℃';
+      document.getElementById('temperature').textContent = `${temp}℃`;
     });
     
     updateServiceStatus(cardId, '動作中 ✓');
@@ -205,15 +204,15 @@ async function startTemperature() {
     updateServiceStatus(cardId, '利用不可');
     document.getElementById(cardId).classList.add('error');
   }
-}
+};
 
 // 加速度計（Period設定なし）
-async function startAccelerometer() {
+const startAccelerometer = async () => {
   const cardId = 'accel-card';
   try {
     updateServiceStatus(cardId, '起動中...');
     
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       throw new Error('GATT未接続');
     }
     
@@ -239,15 +238,15 @@ async function startAccelerometer() {
     updateServiceStatus(cardId, '利用不可');
     document.getElementById(cardId).classList.add('error');
   }
-}
+};
 
 // ボタン
-async function startButtons() {
+const startButtons = async () => {
   const cardId = 'button-card';
   try {
     updateServiceStatus(cardId, '起動中...');
     
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       throw new Error('GATT未接続');
     }
     
@@ -257,16 +256,18 @@ async function startButtons() {
     await buttonA.startNotifications();
     buttonA.addEventListener('characteristicvaluechanged', (event) => {
       const state = event.target.value.getUint8(0);
-      document.getElementById('button-a').textContent = state === 1 ? '押されている' : '離されている';
-      document.getElementById('button-a').style.color = state === 1 ? '#ff0000' : '#333';
+      const element = document.getElementById('button-a');
+      element.textContent = state === 1 ? '押されている' : '離されている';
+      element.style.color = state === 1 ? '#ff0000' : '#333';
     });
     
     const buttonB = await service.getCharacteristic(UUIDS.BUTTON_B);
     await buttonB.startNotifications();
     buttonB.addEventListener('characteristicvaluechanged', (event) => {
       const state = event.target.value.getUint8(0);
-      document.getElementById('button-b').textContent = state === 1 ? '押されている' : '離されている';
-      document.getElementById('button-b').style.color = state === 1 ? '#ff0000' : '#333';
+      const element = document.getElementById('button-b');
+      element.textContent = state === 1 ? '押されている' : '離されている';
+      element.style.color = state === 1 ? '#ff0000' : '#333';
     });
     
     updateServiceStatus(cardId, '動作中 ✓');
@@ -278,15 +279,15 @@ async function startButtons() {
     updateServiceStatus(cardId, '利用不可');
     document.getElementById(cardId).classList.add('error');
   }
-}
+};
 
 // 磁力計（Period設定なし）
-async function startMagnetometer() {
+const startMagnetometer = async () => {
   const cardId = 'mag-card';
   try {
     updateServiceStatus(cardId, '起動中...');
     
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       throw new Error('GATT未接続');
     }
     
@@ -318,7 +319,7 @@ async function startMagnetometer() {
       await bearingChar.startNotifications();
       bearingChar.addEventListener('characteristicvaluechanged', (event) => {
         const bearing = event.target.value.getUint16(0, true);
-        document.getElementById('bearing').textContent = bearing + '°';
+        document.getElementById('bearing').textContent = `${bearing}°`;
       });
       console.log('✓ 方位角取得開始');
       hasData = true;
@@ -340,12 +341,12 @@ async function startMagnetometer() {
     document.getElementById(cardId).classList.add('error');
     throw error;
   }
-}
+};
 
 // LEDに文字を表示
-async function sendTextToLED() {
+const sendTextToLED = async () => {
   try {
-    if (!gattServer || !gattServer.connected) {
+    if (!gattServer?.connected) {
       alert('micro:bitに接続してください');
       return;
     }
@@ -372,7 +373,7 @@ async function sendTextToLED() {
     console.error('LED送信エラー:', error);
     alert('LED送信に失敗しました: ' + error.message);
   }
-}
+};
 
 // Enter押下で送信
 document.addEventListener('DOMContentLoaded', () => {
@@ -391,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function onDisconnected() {
+const onDisconnected = () => {
   console.log('デバイスが切断されました');
   updateStatus('デバイスが切断されました', false);
   document.getElementById('connectBtn').disabled = false;
@@ -406,29 +407,29 @@ function onDisconnected() {
   });
   
   addMessage('接続が切断されました', 'system');
-}
+};
 
-function updateServiceStatus(cardId, status) {
+const updateServiceStatus = (cardId, status) => {
   const card = document.getElementById(cardId);
-  if (card) {
-    let statusEl = card.querySelector('.service-status');
-    if (!statusEl) {
-      statusEl = document.createElement('div');
-      statusEl.className = 'service-status';
-      card.appendChild(statusEl);
-    }
-    statusEl.textContent = 'ステータス: ' + status;
+  if (!card) return;
+  
+  let statusEl = card.querySelector('.service-status');
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.className = 'service-status';
+    card.appendChild(statusEl);
   }
-}
+  statusEl.textContent = `ステータス: ${status}`;
+};
 
-function disconnect() {
-  if (targetDevice && targetDevice.gatt.connected) {
+const disconnect = () => {
+  if (targetDevice?.gatt?.connected) {
     targetDevice.gatt.disconnect();
   }
-}
+};
 
-function updateStatus(message, connected) {
+const updateStatus = (message, connected) => {
   const statusDiv = document.getElementById('status');
   statusDiv.textContent = message;
-  statusDiv.className = 'status ' + (connected ? 'connected' : 'disconnected');
-}
+  statusDiv.className = `status ${connected ? 'connected' : 'disconnected'}`;
+};
