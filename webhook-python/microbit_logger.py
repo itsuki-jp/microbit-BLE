@@ -123,6 +123,7 @@ class WebhookConfig:
     mode: str  # "immediate" または "batch"
     characteristics: Set[str]
     timeout: float
+    security_key: Optional[str] = None
 
 
 def configure_logging(verbose: int) -> None:
@@ -236,8 +237,16 @@ async def run(args: argparse.Namespace) -> None:
             mode=args.webhook_mode,
             characteristics=targets,
             timeout=args.webhook_timeout,
+            security_key=args.webhook_security_key,
         )
         webhook_queue = asyncio.Queue()
+
+    def build_webhook_payload(base: Dict[str, object]) -> Dict[str, object]:
+        if webhook_config and webhook_config.security_key:
+            enriched = dict(base)
+            enriched["security_key"] = webhook_config.security_key
+            return enriched
+        return base
 
     def record_update(name: str, decoded: str) -> None:
         batch[name] = decoded
@@ -248,11 +257,13 @@ async def run(args: argparse.Namespace) -> None:
             and name in webhook_config.characteristics
         ):
             webhook_queue.put_nowait(
-                {
-                    "timestamp": time.time(),
-                    "characteristic": name,
-                    "value": decoded,
-                }
+                build_webhook_payload(
+                    {
+                        "timestamp": time.time(),
+                        "characteristic": name,
+                        "value": decoded,
+                    }
+                )
             )
 
     async def periodic_report() -> None:
@@ -279,7 +290,9 @@ async def run(args: argparse.Namespace) -> None:
                             }
                             if payload:
                                 webhook_queue.put_nowait(
-                                    {"timestamp": timestamp, "values": payload}
+                                    build_webhook_payload(
+                                        {"timestamp": timestamp, "values": payload}
+                                    )
                                 )
                         batch.clear()
                     continue
@@ -303,7 +316,9 @@ async def run(args: argparse.Namespace) -> None:
                     }
                     if payload:
                         webhook_queue.put_nowait(
-                            {"timestamp": timestamp, "values": payload}
+                            build_webhook_payload(
+                                {"timestamp": timestamp, "values": payload}
+                            )
                         )
                 batch.clear()
 
@@ -439,6 +454,10 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=10.0,
         help="Webhook の HTTP タイムアウト秒数（既定: %(default)s）",
+    )
+    parser.add_argument(
+        "--webhook-security-key",
+        help="Webhook リクエストに含めるセキュリティーキー",
     )
     return parser
 
