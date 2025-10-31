@@ -73,6 +73,7 @@ webhook-python/   Python 製 BLE ロガー
    python microbit_logger.py `
      --webhook-url https://webhook.site/xxxx `
      --webhook-mode batch `
+     --webhook-security-key your-secret-key `
      -wc temperature -wc uart_tx
    ```
 
