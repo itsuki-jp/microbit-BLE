@@ -244,7 +244,7 @@ async def run(args: argparse.Namespace) -> None:
     def build_webhook_payload(base: Dict[str, object]) -> Dict[str, object]:
         if webhook_config and webhook_config.security_key:
             enriched = dict(base)
-            enriched["security_key"] = webhook_config.security_key
+            enriched["securityKey"] = webhook_config.security_key
             return enriched
         return base
 
