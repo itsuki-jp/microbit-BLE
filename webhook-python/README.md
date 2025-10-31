@@ -61,7 +61,7 @@ python microbit_logger.py `
 - `--characteristic` / `-c` … 監視したい characteristic を限定（複数指定可）。未指定時は主要な characteristic をすべて購読。
 - `--webhook-url` … Webhook へ JSON POST する場合に指定。
 - `--webhook-mode` … `batch`（1 秒ごとにまとめ送信、既定）または `immediate`（通知ごと）。
-- `--webhook-security-key` … Webhook リクエストの `security_key` フィールドに設定する任意の文字列。
+- `--webhook-security-key` … Webhook リクエストの `securityKey` フィールドに設定する任意の文字列。
 - `--webhook-characteristic` / `-wc` … Webhook に含める characteristic を限定。
 - `-v` / `-vv` … ログの詳細度（INFO / DEBUG）。
 
